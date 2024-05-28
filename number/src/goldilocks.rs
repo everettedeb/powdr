@@ -9,14 +9,13 @@ pub type GoldilocksBaseField = Fp64<MontBackend<GoldilocksBaseFieldConfig, 1>>;
 powdr_field!(GoldilocksField, GoldilocksBaseField);
 
 #[cfg(test)]
-mod test {
+mod tests {
     use crate::traits::int_from_hex_str;
     use test_log::test;
-
     use super::*;
 
     #[test]
-    fn bitwise() {
+    fn bitwise_operations() {
         let n = int_from_hex_str::<GoldilocksField>("00ff00ff00ff00ff");
         let p = int_from_hex_str::<GoldilocksField>("000ff00ff00ff00f");
         let not_n = int_from_hex_str::<GoldilocksField>("ff00ff00ff00ff00");
@@ -36,26 +35,26 @@ mod test {
     }
 
     #[test]
-    fn lower_half() {
+    fn lower_half_check() {
         let x = GoldilocksField::from(0);
         assert!(x.is_in_lower_half());
-        assert!(!(x - 1.into()).is_in_lower_half());
+        assert!(!(x - GoldilocksField::from(1)).is_in_lower_half());
 
         let y = GoldilocksField::from_str_radix("7fffffff80000000", 16).unwrap();
         assert!(y.is_in_lower_half());
-        assert!(!(y + 1.into()).is_in_lower_half());
+        assert!(!(y + GoldilocksField::from(1)).is_in_lower_half());
     }
 
     #[test]
-    #[should_panic]
-    fn integer_div_by_zero() {
+    #[should_panic(expected = "attempt to divide by zero")]
+    fn integer_division_by_zero() {
         let _ = GoldilocksField::from(1).to_arbitrary_integer()
             / GoldilocksField::from(0).to_arbitrary_integer();
     }
 
     #[test]
-    #[should_panic]
-    fn div_by_zero() {
+    #[should_panic(expected = "attempt to divide by zero")]
+    fn field_division_by_zero() {
         let _ = GoldilocksField::from(1) / GoldilocksField::from(0);
     }
 }
